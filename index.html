@@ -229,12 +229,12 @@ const EVENTS = [
    title:'PlayStation 3 Launch',
    subtitle:'Sony\'s Third PlayStation',
    detail:'Released in November (Japan - 2006, International - 2007), the PS3 was the first console to implement an HDMI output, HD 1080p resolutions, and Blu-ray discs. This installment also birthed the PlayStation Network.',
-   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/9/91/Ps3-fat-console.png',hint:'PlayStation 3 console'}},
+   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/9/91/Ps3-fat-console.png',hint:'PlayStation 3 console',fit:'contain'}},
   {year:2006,category:'console',
    title:'Nintendo Wii Launch',
    subtitle:'The face of motion controls',
    detail:'The Wii was Nintendo\'s 6th console and was designed to reach as many different kinds of people as possible. It focused on intuitive controls so that people of all ages would be able to just pick up a controller and play. This console was able to successfully reach the homes of many families.',
-   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Wii-Console.png',hint:'Nintendo Wii console'}},
+   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Wii-Console.png',hint:'Nintendo Wii console',fit:'contain'}},
   {year:2006,category:'tech',
    title:'PSN & Xbox Live - Online Multiplayer',
    subtitle:'Building bridges with video games',
@@ -264,7 +264,7 @@ const EVENTS = [
    title:'Twitch',
    subtitle:'Video game livestreaming',
    detail:'Originally starting as Justin.tv, Twitch became its own platform after the former\'s video game livestreaming category took off immensely. I personally didn\'t hear about it until a few years later, but Twitch\'s launch made waves in gaming culture. It\'s no longer owned by the two Yale grads Justin Kan and Emmett Shear after it was acquired by Amazon in 2014. Currently, many people can make money on Twitch if they become popular enough, and some of them don\'t even need to play games to become an internet celebrity.',
-   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg',hint:'Twitch logo'}},
+   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg',hint:'Twitch logo',fit:'contain'}},
   {year:2017,category:'art',
    title:'Cuphead',
    subtitle:'A carefully crafted run-and-gun platformer masterpiece',
@@ -294,12 +294,12 @@ const EVENTS = [
    title:'VR Popularization',
    subtitle:'Oculus Rift, HTC Vive, and PlayStation VR',
    detail:'In 2016, many VR systems made their way to shelves and homes. I remember being really interested in VR when it first came out, but I never actually owned a headset. A lot of games slowly started supporting VR modes that offered some pretty crazy ways to experience the same game in a different way. I did get to try out some VR games every now and then and I was super impressed.',
-   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/0/08/Oculus-Rift-CV1-Headset-Front_with_transparent_background.png',hint:'Oculus Rift / HTC Vive product photo'}},
+   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/0/08/Oculus-Rift-CV1-Headset-Front_with_transparent_background.png',hint:'Oculus Rift / HTC Vive product photo',fit:'contain'}},
   {year:2017,category:'console',
    title:'Nintendo Switch',
    subtitle:'Nintendo\'s next big thing',
    detail:'I remember when the Nintendo Switch first got leaked back online and it was known as the "NX". I thought it was the coolest thing ever, but the leaks weren\'t all totally accurate. Regardless, the Switch is currently Nintendo\'s best selling console ever. It\'s part handheld and part console, which is something relatively revolutional. The console had to make some compromises to perform in this hybrid fashion, so it really couldn\'t afford to compete with what PlayStation and Xbox put out in terms of computational and graphical power, but it still did great. It released with The Legend of Zelda: Breath of the Wild, which did a ton of favors for the console. The Switch was and is amazing, and it\'s currently the second best selling console in the world.',
-   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/5/5e/Nintendo_Switch_Console.png',hint:'Nintendo Switch console'}},
+   media:{type:'image',url:'https://upload.wikimedia.org/wikipedia/commons/5/5e/Nintendo_Switch_Console.png',hint:'Nintendo Switch console',fit:'contain'}},
   {year:2017,category:'art',
    title:'Breath of the Wild',
    subtitle:'The largest open-world Zelda game',
@@ -506,7 +506,8 @@ function buildLanes() {
         : null;
       if (thumbImg) {
         const [r,g,b] = [1,3,5].map(i => parseInt(cat.color.slice(i,i+2),16));
-        thumb.style.background = `linear-gradient(rgba(${r},${g},${b},.38),rgba(${r},${g},${b},.38)),url(${thumbImg}) center/cover no-repeat`;
+        const bgSize = ev.media.fit === 'contain' ? 'contain' : 'cover';
+        thumb.style.background = `linear-gradient(rgba(${r},${g},${b},.38),rgba(${r},${g},${b},.38)),url(${thumbImg}) center/${bgSize} no-repeat`;
         thumb.classList.add('has-img');
       } else {
         thumb.style.background = `linear-gradient(145deg,${shade(cat.color)},${cat.color})`;
@@ -596,8 +597,8 @@ function updateModal() {
     }
   } else {
     if (ev.media.url) {
-      media.style.background = '#111';
-      media.innerHTML = `<img src="${ev.media.url}" alt="${ev.title}" style="width:100%;height:100%;object-fit:cover;display:block">`;
+      media.style.background = ev.media.fit === 'contain' ? '#1a1a2e' : '#111';
+      media.innerHTML = `<img src="${ev.media.url}" alt="${ev.title}" style="width:100%;height:100%;object-fit:${ev.media.fit||'cover'};display:block">`;
     } else {
       media.style.background = `${cat.color}16`;
       media.innerHTML = `
