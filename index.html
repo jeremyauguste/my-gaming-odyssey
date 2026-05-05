@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Gaming Odyssey</title>
+<style>
+:root {
+  --bg:    #f4f3ee;
+  --white: #ffffff;
+  --bdr:   #e2e0d9;
+  --text:  #1a1a2a;
+  --muted: #8a8880;
+  --lbl-w: 210px;
+  --yr-w:  148px;
+  --hdr-h: 100px;
+  --yr-h:  54px;
+  --thumb-h: 64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+
+/* ── HEADER ─────────────────────────────────────────── */
+header{height:var(--hdr-h);background:var(--white);border-bottom:1px solid var(--bdr);box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 20px;position:relative;z-index:60;flex-shrink:0}
+.hdr-title{font-size:1.5rem;font-weight:800;white-space:nowrap;text-align:center}
+.hdr-title span{font-weight:400;color:var(--muted);margin-left:7px;font-size:1.1rem}
+.hdr-sub{display:flex;align-items:center;gap:14px}
+.hdr-hint{font-size:.68rem;color:var(--muted);white-space:nowrap;opacity:.7}
+.start-btn{padding:9px 28px;border-radius:10px;border:1.5px solid #27ae60;background:#27ae60;color:#fff;font-size:.9rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;box-shadow:0 3px 14px rgba(39,174,96,.28)}
+.start-btn:hover{background:transparent;color:#27ae60}
+
+/* ── TIMELINE WRAP ───────────────────────────────────── */
+.tl-wrap{height:calc(100vh - var(--hdr-h));overflow:auto;display:flex;flex-direction:column}
+.tl-wrap::-webkit-scrollbar{height:6px;width:6px}
+.tl-wrap::-webkit-scrollbar-track{background:var(--bg)}
+.tl-wrap::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
+.tl-inner{flex:1;display:flex;flex-direction:column}
+
+/* ── YEAR ROW ────────────────────────────────────────── */
+.year-row{display:flex;height:var(--yr-h);background:var(--white);border-bottom:2px solid var(--bdr);position:sticky;top:0;z-index:40;flex-shrink:0}
+.yr-corner{width:var(--lbl-w);flex-shrink:0;position:sticky;left:0;background:var(--white);z-index:41;border-right:2px solid var(--bdr);display:flex;align-items:center;padding-left:14px;font-size:.62rem;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+.yr-marks{display:flex}
+.yr-mark{flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding-left:10px;font-size:.72rem;font-weight:800;color:var(--muted);border-right:1px dashed var(--bdr);position:relative}
+.yr-mark.has-events{color:var(--text)}
+.yr-mark.yr-start{background:rgba(39,174,96,.07);border-left:3px solid #27ae60}
+.yr-mark.yr-end{background:rgba(202,111,30,.07);border-right:3px solid #ca6f1e}
+.yr-tag{font-size:.54rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+.yr-start .yr-tag{color:#27ae60}
+.yr-end .yr-tag{color:#ca6f1e}
+
+/* ── LANES ───────────────────────────────────────────── */
+.lanes{display:flex;flex-direction:column;flex:1}
+.lane{display:flex;transition:height .35s cubic-bezier(.4,0,.2,1);border-bottom:1px solid var(--bdr);flex-shrink:0;position:relative}
+
+/* ── LANE LABEL ──────────────────────────────────────── */
+.lane-label{width:var(--lbl-w);flex-shrink:0;position:sticky;left:0;z-index:25;border-right:2px solid var(--bdr);display:flex;align-items:center;padding:0 12px;gap:8px}
+.lbl-pip{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.lbl-text{display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.lbl-name{font-size:.85rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbl-count{font-size:.78rem;color:var(--muted)}
+
+/* ── LANE TRACK ──────────────────────────────────────── */
+.lane-track{position:relative;flex:1}
+.lane-line{position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);pointer-events:none;border-radius:1px}
+.yr-vline{position:absolute;top:0;bottom:0;width:1px;background:var(--bdr);pointer-events:none;opacity:.55}
+.lane-cap-start{position:absolute;left:0;top:20%;height:60%;width:3px;border-radius:0 2px 2px 0}
+.lane-cap-end{position:absolute;right:0;top:20%;height:60%;width:3px;border-radius:2px 0 0 2px}
+
+/* ── THUMBNAILS ──────────────────────────────────────── */
+.ev-thumb{
+  position:absolute;
+  top:50%;
+  width:108px;
+  height:var(--thumb-h,64px);
+  transform:translate(-50%,-50%);
+  border-radius:9px;
+  cursor:pointer;
+  z-index:5;
+  border:2px solid rgba(255,255,255,.5);
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
+  transition:transform .15s,box-shadow .15s,border-color .15s;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  padding:6px 8px 5px;
+  gap:3px;
+}
+.ev-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.05) 0%,rgba(0,0,0,.25) 100%);pointer-events:none;border-radius:inherit}
+.ev-thumb:hover{transform:translate(-50%,-50%) scale(1.07);box-shadow:0 5px 18px rgba(0,0,0,.25);border-color:rgba(255,255,255,.9)}
+.ev-thumb.active{transform:translate(-50%,-50%) scale(1.12);box-shadow:0 6px 24px rgba(0,0,0,.32);border-color:#fff}
+.ev-thumb-yr{font-size:.55rem;font-weight:800;color:rgba(255,255,255,.8);line-height:1;position:relative;z-index:1}
+.ev-thumb-title{font-size:.63rem;font-weight:700;color:#fff;line-height:1.28;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;position:relative;z-index:1;flex:1}
+
+/* ── MODAL OVERLAY ───────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,15,24,.7);backdrop-filter:blur(5px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+
+.modal{background:var(--white);border-radius:18px;width:min(940px,94vw);height:min(560px,88vh);display:grid;grid-template-columns:5fr 7fr;overflow:hidden;position:relative;box-shadow:0 32px 100px rgba(0,0,0,.42);animation:mIn .2s cubic-bezier(.34,1.2,.64,1)}
+@keyframes mIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* close */
+.modal-close{position:absolute;top:13px;right:13px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(0,0,0,.1);color:#555;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .15s}
+.modal-close:hover{background:rgba(0,0,0,.2)}
+
+/* media panel */
+.modal-media{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative;overflow:hidden}
+.modal-play{width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.18);border:2.5px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center}
+.modal-media-hint{font-size:.78rem;text-align:center;padding:0 22px;line-height:1.5;opacity:.72}
+
+/* info panel */
+.modal-info{display:flex;flex-direction:column;padding:26px 26px 18px;overflow-y:auto}
+.modal-info::-webkit-scrollbar{width:3px}
+.modal-info::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.modal-meta{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-shrink:0}
+.modal-badge{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:4px;color:#fff}
+.modal-year{font-size:.78rem;font-weight:700;color:var(--muted)}
+.modal-title{font-size:1.15rem;font-weight:800;line-height:1.25;color:var(--text);margin-bottom:6px;flex-shrink:0}
+.modal-sub{font-size:.82rem;color:var(--muted);line-height:1.45;margin-bottom:14px;flex-shrink:0}
+.modal-sep{border:none;height:1px;background:var(--bdr);margin-bottom:13px;flex-shrink:0}
+.modal-detail{font-size:.82rem;color:#4a4a5a;line-height:1.7;flex:1;overflow-y:auto}
+.modal-ph-note{margin-top:9px;font-size:.71rem;color:#b03a8a;display:none;flex-shrink:0}
+.modal-ph-note.show{display:block}
+
+/* ── INTRO OVERLAY ───────────────────────────────────── */
+.intro-overlay{position:fixed;inset:0;z-index:900;background:rgba(244,243,238,.55);backdrop-filter:blur(3.5px);-webkit-backdrop-filter:blur(3.5px);display:flex;align-items:center;justify-content:center;transition:opacity .55s ease;overflow:hidden}
+.intro-overlay.hiding{opacity:0;pointer-events:none}
+.intro-deco{position:absolute;inset:0;pointer-events:none}
+.intro-deco::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:680px;height:680px;border-radius:50%;background:radial-gradient(circle,rgba(39,174,96,.06) 0%,transparent 68%)}
+.intro-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:48px 40px;max-width:580px}
+.intro-card{position:relative;z-index:1;background:var(--white);border:1px solid var(--bdr);border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:52px 52px 44px;max-width:520px;width:90vw}
+.intro-eyebrow{font-size:.68rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#27ae60}
+.intro-title{font-size:clamp(2.2rem,7vw,3.8rem);font-weight:900;line-height:1.06;color:var(--text);letter-spacing:-.025em}
+.intro-sub{font-size:.9rem;color:var(--muted);line-height:1.7;max-width:380px}
+.intro-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+.intro-pill{padding:4px 13px;border-radius:20px;border:1.5px solid var(--bdr);font-size:.68rem;font-weight:700;color:var(--muted);background:var(--bg)}
+.intro-btn{margin-top:6px;padding:13px 40px;border-radius:10px;border:none;background:#27ae60;color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;letter-spacing:.025em;box-shadow:0 4px 18px rgba(39,174,96,.28);transition:background .15s,transform .12s,box-shadow .15s}
+.intro-btn:hover{background:#219d55;transform:translateY(-1px);box-shadow:0 8px 26px rgba(39,174,96,.36)}
+.intro-btn:active{transform:translateY(0)}
+
+/* nav row */
+.modal-nav-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr);flex-shrink:0}
+.modal-nav-btn{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;border:1.5px solid var(--bdr);background:transparent;color:var(--text);font-size:.76rem;font-weight:600;cursor:pointer;transition:background .12s,border-color .12s,opacity .12s}
+.modal-nav-btn:hover:not(:disabled){background:var(--bg);border-color:#c8c4ba}
+.modal-nav-btn:disabled{opacity:.28;cursor:default}
+.modal-progress{font-size:.72rem;color:var(--muted);font-weight:600;text-align:center}
+.modal-progress small{display:block;font-size:.62rem;opacity:.7;margin-top:1px}
+/* category nav row */
+.modal-cat-row{margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr)}
+.modal-cat-btn{border:none!important;color:#fff!important}
+.modal-cat-btn:hover:not(:disabled){opacity:.82}
+.modal-cat-label{font-size:.7rem;font-weight:700;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- Intro splash -->
+<div class="intro-overlay" id="introOverlay">
+  <div class="intro-deco"></div>
+  <div class="intro-card">
+    <div class="intro-eyebrow">A Personal Timeline &middot; 2003 &ndash; 2026</div>
+    <h1 class="intro-title">My Gaming<br>Odyssey</h1>
+    <p class="intro-sub">Game art that changed the medium, consoles that redefined play, streaming pioneers, industry controversies, and personal milestones — from LittleBigPlanet to Marathon.</p>
+    <div class="intro-pills">
+      <div class="intro-pill">29 Events</div>
+      <div class="intro-pill">7 Categories</div>
+      <div class="intro-pill">23 Years</div>
+    </div>
+    <button class="intro-btn" id="introBtn">Begin the Journey</button>
+  </div>
+</div>
+
+<header>
+  <div class="hdr-title">My Gaming Odyssey <span>2003–2026</span></div>
+  <button class="start-btn" id="startBtn">▶ Start from First Event</button>
+  <div class="hdr-sub">
+    <div class="hdr-hint">Click a thumbnail to explore · ◀ ▶ to navigate</div>
+  </div>
+</header>
+
+<div class="tl-wrap" id="tlWrap">
+  <div class="tl-inner">
+    <div class="year-row">
+      <div class="yr-corner">Branch</div>
+      <div class="yr-marks" id="yrMarks"></div>
+    </div>
+    <div class="lanes" id="lanes"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div class="modal-media" id="modalMedia"></div>
+    <div class="modal-info">
+      <div class="modal-meta" id="modalMeta"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <p class="modal-sub" id="modalSub"></p>
+      <hr class="modal-sep">
+      <p class="modal-detail" id="modalDetail"></p>
+      <p class="modal-ph-note" id="modalNote"></p>
+      <div class="modal-nav-row">
+        <button class="modal-nav-btn" id="modalPrev">◀ Prev</button>
+        <div class="modal-progress" id="modalProgress"></div>
+        <button class="modal-nav-btn" id="modalNext">Next ▶</button>
+      </div>
+      <div class="modal-nav-row modal-cat-row">
+        <button class="modal-nav-btn modal-cat-btn" id="modalCatPrev">◀ Prev</button>
+        <div class="modal-cat-label" id="modalCatLabel"></div>
+        <button class="modal-nav-btn modal-cat-btn" id="modalCatNext">Next ▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CATEGORIES ───────────────────────────────────────────────────────────────
+const CATS = {
+  art:       {label:'Game Art',            color:'#8e44ad'},
+  console:   {label:'Console Release',     color:'#2471a3'},
+  games:     {label:'Popular Games',        color:'#1e8449'},
+  streamers: {label:'Streamers/Creators',  color:'#c0392b'},
+  flops:     {label:'Flops & Controversies', color:'#ca6f1e'},
+  tech:      {label:'Tech Advance',        color:'#148f77'},
+  personal:  {label:'Personal Milestones',  color:'#b03a8a'},
+};
+const CAT_ORDER = Object.keys(CATS);
+
+// ── EVENTS  (personal milestones marked placeholder:true — update in place) ──
+const EVENTS = [
+  {year:2006,category:'console',
+   title:'PlayStation 3 Launch',
+   subtitle:'Sony\'s Third PlayStation',
+   detail:'Released in November (Japan - 2006, International - 2007), the PS3 was the first console to implement an HDMI output, HD 1080p resolutions, and Blu-ray discs. This installment also birthed the PlayStation Network.',
+   media:{type:'video',hint:'PlayStation 3 launch event footage'}},
+  {year:2006,category:'console',
+   title:'Nintendo Wii Launch',
+   subtitle:'The face of motion controls',
+   detail:'The Wii was Nintendo\'s 6th console and was designed to reach as many different kinds of people as possible. It focused on intuitive controls so that people of all ages would be able to just pick up a controller and play. This console was able to successfully reach the homes of many families.',
+   media:{type:'video',hint:'Nintendo Wii launch / Wii Sports gameplay footage'}},
+  {year:2006,category:'tech',
+   title:'PSN & Xbox Live - Online Multiplayer',
+   subtitle:'Building bridges with video games',
+   detail:'When PlayStation and Xbox released their forms of online play to the public, something shifted in gaming forever. People didn\'t need to rely on LAN parties to play multiplayer games together anymore: people could now play multitudes of games together without needing to leave the house. It\'s thanks to things like PlayStation\'s and Xbox\'s party chat features that many people were able to create fond memories playing games like Call of Duty and Halo.',
+   media:{type:'image',hint:'Xbox Live / early PSN interface screenshot'}},
+  {year:2008,category:'art',
+   title:'Super Smash Bros. Brawl',
+   subtitle:'The most realistic looking Smash Bros. game',
+   detail:'Brawl (the third Super Smash Bros. game) released for the Nintendo Wii this year. One of the first things fans of the series noticed about this game was how different the game looked compared to previous installments. It boasted some pretty realistic graphics for its time and gave the characters in it some pretty bold looks. Characters like Mario looked pretty different since this was one of the first games where you could see the actual material that his overalls are made of. Other characters fit relatively well, like Snake, a shocking newcomer of the series.',
+   media:{type:'image',hint:'Super Smash Bros. Brawl character roster / key art'}},
+  {year:2009,category:'art',
+   title:'Borderlands',
+   subtitle:'The comedic cel-shaded shooter',
+   detail:'The first Borderlands game released this year and featured a shocking cartoony kind of art style. Not many games (much less shooters) looked like Borderlands when it released, which was kind of polarizing. Some shooter games will occasionally use a cel-shaded art style and fans will sometimes refer to it as "Borderlands style."',
+   media:{type:'image',hint:'Borderlands art style comparison / cel-shaded gameplay screenshot'}},
+  {year:2008,category:'games',
+   title:'LittleBigPlanet',
+   subtitle:'A cute puzzle platformer',
+   detail:'Released in 2008 for the PS3, LittleBigPlanet was a special kind of platformer that allowed its players to create and share their own custom levels. A major theme of the game was creativity, so the game\'s mascot was made to be this bland thing that players could customize in a lot of ways. This game was played a huge part in my childhood and even represented Sony and its PlayStation to many others.',
+   media:{type:'video',hint:'LittleBigPlanet launch trailer'}},
+  {year:2008,category:'personal',
+   title:'My First Game',
+   subtitle:'My earliest gaming experience',
+   detail:'I don\'t remember if this was verifiably the first game I\'ve ever played, but it wsa definitely one of the earliest. I remember when the game first came out and I played it with my family. I don\'t hope to ever forget that experience. I was super young and was totally impressed by what you could do in the game. They don\'t really make any more LittleBigPlanets, but I still think and talk about it from time to time.',
+   media:{type:'image',hint:'Add your own photo or screenshot'},placeholder:true},
+  {year:2011,category:'streamers',
+   title:'Twitch',
+   subtitle:'Video game livestreaming',
+   detail:'Originally starting as Justin.tv, Twitch became its own platform after the former\'s video game livestreaming category took off immensely. I personally didn\'t hear about it until a few years later, but Twitch\'s launch made waves in gaming culture. It\'s no longer owned by the two Yale grads Justin Kan and Emmett Shear after it was acquired by Amazon in 2014. Currently, many people can make money on Twitch if they become popular enough, and some of them don\'t even need to play games to become an internet celebrity.',
+   media:{type:'image',hint:'Early Twitch interface / Justin.tv logo'}},
+  {year:2017,category:'art',
+   title:'Cuphead',
+   subtitle:'A carefully crafted run-and-gun platformer masterpiece',
+   detail:'Cuphead is known for being a fairly difficult game, but a lot of its notoriety belongs to its art style. The games assets are pretty much all hand drawn, which you could imagine took a long time to create. Cuphead\'s art style draws a lot of inspiration from the cartoons of the 1930s. Its music and animation impressed many people at the time, and it continues to impress many people today. I try not to think too hard about the effort that had to go into creating the game\'s animations because it makes my head hurt imagining how long it must have taken.',
+   media:{type:'video',hint:'Cuphead reveal trailer / gameplay footage'}},
+  {year:2014,category:'flops',
+   title:'Lizard Squad vs. Online Gaming',
+   subtitle:'The Christmas DDoS attack of 2014',
+   detail:'On December 25th, 2014, a hacker group known as Lizard Squad attacked PlayStation and Xbox servers, prohibiting players from getting online. I remember feeling fairly annoyed by this attack back then, but I smile thinking back on it nowadays. It\'s now just the basis of a joke people sometimes reference whenever servers have issues. Many people remember this attack as the one event that allows people to even remember the name "Lizard Squad".',
+   media:{type:'image',hint:'Lizard Squad Twitter announcement / Xbox Live & PSN outage notice'}},
+  {year:2014,category:'games',
+   title:'Destiny 1',
+   subtitle:'Bungie\'s big hit FPSMMORPG',
+   detail:'Bungie created Destiny after relinquishing the Halo series to Microsoft. It has a lot of Halo-feeling gameplay that players can enjoy as they travel across the solar system fighting to save what remains of humankind. This game placed a large focus on its ever expanding narrative and its multiplayer experiences. Even today the game can still be experienced and enjoyed almost as if it just released.',
+   media:{type:'video',hint:'Destiny reveal / live action trailer'}},
+  {year:2014,category:'personal',
+   title:'My Destiny 1 & PS4 Experience',
+   subtitle:'How I fell into Destiny',
+   detail:'I was lucky enough to try Destiny when it was in its super early form and had a hard time with it initially. I thought the game\'s weapons and abilities were really cool, but I was kind of really bad at it. When I got to own the game some time later, I kind of stumbled around on and off over the years. The first time I really got into it was around the time the Taken King DLC released with its new story and abilities. It was like magic for me and I learned how to sink so many hours into the game. This was also around the time I got a PS4, which was also insane to me because the transition from what I knew with the PS3 to what I got with the PS4 was like night and day.',
+   media:{type:'image',hint:'Add your own Destiny screenshot'},placeholder:true},
+  {year:2016,category:'games',
+   title:'Overwatch',
+   subtitle:"The genre-defining hero shooter",
+   detail:'Overwatch released in 2016 and was developed by Blizzard. It was this competitive multiplayer game that combined unique abilities mixed with unique characters and weapons. It wasn\'t the first to implement this kind of class-based gameplay, as Team Fortress 2 is widely attributed as the game that popularized it. However, Overwatch boasted a plethora of unique characters that encouraged players to communicate effectively in order to achieve victory. Overwatch\'s reach and popularity eventually gave it a huge esports scene.',
+   media:{type:'video',hint:'Overwatch animated shorts / launch trailer'}},
+  {year:2016,category:'tech',
+   title:'VR Popularization',
+   subtitle:'Oculus Rift, HTC Vive, and PlayStation VR',
+   detail:'In 2016, many VR systems made their way to shelves and homes. I remember being really interested in VR when it first came out, but I never actually owned a headset. A lot of games slowly started supporting VR modes that offered some pretty crazy ways to experience the same game in a different way. I did get to try out some VR games every now and then and I was super impressed.',
+   media:{type:'image',hint:'Oculus Rift / HTC Vive product photo'}},
+  {year:2017,category:'console',
+   title:'Nintendo Switch',
+   subtitle:'Nintendo\'s next big thing',
+   detail:'I remember when the Nintendo Switch first got leaked back online and it was known as the "NX". I thought it was the coolest thing ever, but the leaks weren\'t all totally accurate. Regardless, the Switch is currently Nintendo\'s best selling console ever. It\'s part handheld and part console, which is something relatively revolutional. The console had to make some compromises to perform in this hybrid fashion, so it really couldn\'t afford to compete with what PlayStation and Xbox put out in terms of computational and graphical power, but it still did great. It released with The Legend of Zelda: Breath of the Wild, which did a ton of favors for the console. The Switch was and is amazing, and it\'s currently the second best selling console in the world.',
+   media:{type:'video',hint:'Nintendo Switch reveal trailer (Oct 2016)'}},
+  {year:2017,category:'art',
+   title:'Breath of the Wild',
+   subtitle:'The largest open-world Zelda game',
+   detail:'The Nintendo Switch wasn\'t the most graphically advanced console of its time on account of being part handheld, but that didn\'t stop Breath of the Wild from being as visually stunning as it was. Given the game\'s vast environments and capabilities, it\'s amazing how well the game looked and ran on the Switch. It holds up even now, almost 10 years later, and still sits near and dear to the hearts of many, even my own.',
+   media:{type:'image',hint:'BotW Hyrule landscape / art style screenshots'}},
+  {year:2017,category:'games',
+   title:'Persona 5',
+   subtitle:'The visually striking game with a timeless soundtrack',
+   detail:'This JRPG consisted of an enticing story, an amazing soundtrack, and an inspiring art direction. This game did wonder\'s for turn-based combat and inspired many with it\'s unique visuals and UI.',
+   media:{type:'video',hint:'Persona 5 North America launch trailer'}},
+  {year:2017,category:'games',
+   title:'Destiny 2',
+   subtitle:'The sequel to Bungie\'s 2014 title',
+   detail:'Destiny 2 brought forth a new narrative and world to explore upon release. It underwent some evolutions to become more than it was before, and it also became playable on PC. This is when I REALLY got into the Destiny series.',
+   media:{type:'video',hint:'Destiny 2 launch trailer'}},
+  {year:2017,category:'games',
+   title:'Sonic Mania',
+   subtitle:'The love letter to many classic Sonic games',
+   detail:'Sonic Mania was created by many fans of the game series and did a wonderful job delivering to the people. It reimagined some of the past classic 90s Sonic games in a super fun and modern way without compromising on what made them great in the first place. I played this game until I completed every single aspect of it as I could.',
+   media:{type:'image',hint:'Sonic Mania key art / gameplay screenshot'}},
+  {year:2018,category:'streamers',
+   title:'Ninja\'s Fame',
+   subtitle:'The streamer that changed streaming',
+   detail:'Tyler \'Ninja\' Blevins is a streamer that is mostly known for how popular he got playing Fortite online. For many people he popularized video game streaming and brought it to the mainstream. His stream with popular musician Drake is cited as one of the moments that married streaming with the mainstream.',
+   media:{type:'image',hint:'Ninja + Drake Fortnite stream screenshot'}},
+  {year:2019,category:'tech',
+   title:'Cloud Gaming',
+   subtitle:'Gaming without a console',
+   detail:'Over the years gaming has tried to make a shift to the cloud in some way, shape, or form. One major player in this was Google and its Stadia platform that allowed people to stream games from the cloud without needing to depend on hardware. It was dependant on a subscription and a strong internet connection, so .',
+   media:{type:'image',hint:'Google Stadia controller / reveal event photo'}},
+  {year:2020,category:'console',
+   title:'PlayStation 5 — The SSD Generation',
+   subtitle:'Near-instant load times, ray tracing, and DualSense haptics define the leap',
+   detail:'The PS5 launched November 2020 mid-pandemic, selling out instantly due to chip shortages that lasted nearly two years. The defining upgrade was the solid-state drive — eliminating load screens and enabling open worlds with no streaming pauses. The DualSense controller added adaptive triggers and haptic feedback that gave games a new tactile dimension unlike anything a controller had done before.',
+   media:{type:'video',hint:'PlayStation 5 reveal event footage'}},
+  {year:2020,category:'flops',
+   title:'Cyberpunk 2077 — The Most Anticipated Disaster in Gaming',
+   subtitle:'Years of hype collapse into crashes, refunds, and a PlayStation Store removal',
+   detail:'After years of hype and multiple delays, Cyberpunk 2077 launched December 2020 in a state borderline unplayable on PS4 and Xbox One. Sony pulled it from the PlayStation Store, and CD Projekt Red faced class-action lawsuits. It became the defining example of overpromising and crunch culture — before a remarkable 2023 redemption.',
+   media:{type:'video',hint:'Cyberpunk 2077 launch day bugs / review footage'}},
+  {year:2022,category:'personal',
+   title:'[PLACEHOLDER] Persona 5 Royal — A Game That Changed Your Storytelling Bar',
+   subtitle:'130 hours of proof that games can be as emotionally resonant as literature',
+   detail:'Adjust to when you actually played it — P5 Royal released in North America in March 2022. Add your own take: which characters stuck with you, what the third-semester content meant, and how it shifted what you expect from narrative games going forward. This is where your taste for deep story-driven RPGs like Metaphor: ReFantazio comes from.',
+   media:{type:'image',hint:'Add your own Persona 5 Royal screenshot'},placeholder:true},
+  {year:2020,category:'games',
+   title:'Cyberpunk 2077 — Night City',
+   subtitle:'Beneath the bugs, one of the most ambitious open worlds and stories in gaming',
+   detail:'Set aside the disastrous launch — the world Cyberpunk 2077 built was genuinely remarkable. Night City is one of the most densely detailed urban environments in gaming, layered with interconnected storylines, branching dialogue, and a main narrative that grapples with identity, mortality, and corporate power. V and Johnny Silverhand\'s relationship across the game\'s runtime is some of the most compelling character writing the medium has produced.',
+   media:{type:'video',hint:'Cyberpunk 2077 story trailer / Night City gameplay'}},
+  {year:2023,category:'personal',
+   title:'[PLACEHOLDER] Destiny 2 Duo Raid — A Pinnacle Gaming Moment',
+   subtitle:'Completing a 6-player raid with two people is exactly as hard as it sounds',
+   detail:'Add the specific raid name and adjust the year. Most Destiny 2 raids are built for six coordinated players — finishing one with just two requires complete mastery of every mechanic and absolute trust in your partner. Solo flawless dungeons and duo raids are the pinnacle of Destiny\'s challenge ecosystem. This is one of your defining moments as a gamer.',
+   media:{type:'image',hint:'Add your own Destiny 2 raid screenshot or clip'},placeholder:true},
+  {year:2023,category:'personal',
+   title:'[PLACEHOLDER] Grasp of Avarice — Solo Flawless',
+   subtitle:'One of Destiny 2\'s most demanding dungeons, completed alone without dying',
+   detail:'Grasp of Avarice launched in December 2021 as part of Destiny 2\'s 30th Anniversary event — a dungeon built around the original Destiny 1 Loot Cave, reworked into a multi-encounter gauntlet. Completing it solo flawless means mastering every mechanic alone with no deaths allowed. Add your own details: when you ran it, how many attempts it took, and what it felt like to finish.',
+   media:{type:'image',hint:'Add your own Grasp of Avarice screenshot or clip'},placeholder:true},
+  {year:2024,category:'games',
+   title:'Metaphor: ReFantazio',
+   subtitle:'Atlus\'s new IP earns Game of the Year recognition and expands the JRPG audience',
+   detail:'Metaphor: ReFantazio (October 2024) was Atlus\'s first wholly original RPG universe since Persona, and it delivered. A fantasy political epic with turn-based combat, deep party mechanics, and a time-management structure, it earned near-universal critical acclaim and multiple Game of the Year nominations. For fans of Persona 5, it proved Atlus could build a new world just as compelling.',
+   media:{type:'video',hint:'Metaphor: ReFantazio launch trailer'}},
+  {year:2026,category:'games',
+   title:'Marathon — Bungie\'s New Universe',
+   subtitle:'The studio behind Destiny enters the extraction shooter genre with a new sci-fi IP',
+   detail:'Bungie\'s Marathon is a PvP extraction shooter set in a far-future universe drawing from the lore of the original 1994 Marathon trilogy. It marks a significant bet for the studio — a new IP in a competitive genre, built on years of Destiny\'s shared-world expertise. For players who have followed Bungie since Destiny 1, Marathon represents the next chapter from the studio that defined the genre.',
+   media:{type:'image',hint:'Marathon (2026) key art / gameplay screenshot'}},
+];
+
+// Assign IDs and compute sorted order
+EVENTS.forEach((ev, i) => { ev.id = i; });
+const SORTED = [...EVENTS].sort((a, b) =>
+  a.year !== b.year ? a.year - b.year : CAT_ORDER.indexOf(a.category) - CAT_ORDER.indexOf(b.category)
+);
+SORTED.forEach((ev, i) => { ev.sortIdx = i; });
+
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+const YR_START = 2003, YR_END = 2026;
+const LBL_W = 172, HDR_H = 100, YR_ROW_H = 54;
+const THUMB_W = 108, THUMB_GAP = 8, YR_MIN_W = 148, YR_PAD = 40;
+
+// Each year column is wide enough to fit its busiest lane without overlap
+const maxByYear = {};
+for (let y = YR_START; y <= YR_END; y++) {
+  maxByYear[y] = 0;
+  CAT_ORDER.forEach(cat => {
+    const n = EVENTS.filter(e => e.year === y && e.category === cat).length;
+    if (n > maxByYear[y]) maxByYear[y] = n;
+  });
+}
+function colWidth(n) {
+  return n <= 1 ? YR_MIN_W : (n - 1) * (THUMB_W + THUMB_GAP) + THUMB_W + YR_PAD;
+}
+const yearWidths = {}, yearLeft = {};
+let _cumX = 0;
+for (let y = YR_START; y <= YR_END; y++) {
+  yearWidths[y] = colWidth(maxByYear[y]);
+  yearLeft[y] = _cumX;
+  _cumX += yearWidths[y];
+}
+const TOTAL_YR_W = _cumX;
+
+function yearToX(y) { return yearLeft[y] + yearWidths[y] / 2; }
+
+function shade(hex, f = 0.72) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;
+}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let currentIdx = 0;
+let modalOpen  = false;
+
+// ── YEAR RULER ───────────────────────────────────────────────────────────────
+function buildYearRuler() {
+  const wrap = document.getElementById('yrMarks');
+  const evYears = new Set(EVENTS.map(e => e.year));
+  for (let y = YR_START; y <= YR_END; y++) {
+    const el = document.createElement('div');
+    el.className = 'yr-mark';
+    el.style.width = yearWidths[y] + 'px';
+    if (evYears.has(y)) el.classList.add('has-events');
+    if (y === YR_START) {
+      el.classList.add('yr-start');
+      el.innerHTML = `<span>${y}</span><span class="yr-tag">Start</span>`;
+    } else if (y === YR_END) {
+      el.classList.add('yr-end');
+      el.innerHTML = `<span>${y}</span><span class="yr-tag">Now</span>`;
+    } else {
+      el.textContent = y;
+    }
+    wrap.appendChild(el);
+  }
+}
+
+// ── LANES ────────────────────────────────────────────────────────────────────
+function buildLanes() {
+  const wrap = document.getElementById('lanes');
+  Object.entries(CATS).forEach(([key, cat]) => {
+    const catEvs = EVENTS.filter(e => e.category === key);
+
+    const lane = document.createElement('div');
+    lane.className = 'lane';
+    lane.dataset.cat = key;
+
+    // Label
+    const lbl = document.createElement('div');
+    lbl.className = 'lane-label';
+    lbl.style.background = cat.color;
+    lbl.innerHTML = `<div class="lbl-pip" style="background:rgba(255,255,255,.45)"></div>
+      <div class="lbl-text">
+        <div class="lbl-name" style="color:#fff">${cat.label}</div>
+        <div class="lbl-count" style="color:rgba(255,255,255,.7)">${catEvs.length} event${catEvs.length !== 1 ? 's' : ''}</div>
+      </div>`;
+
+    // Track
+    const track = document.createElement('div');
+    track.className = 'lane-track';
+
+    // Lane line
+    const line = document.createElement('div');
+    line.className = 'lane-line';
+    line.style.background = `${cat.color}38`;
+    track.appendChild(line);
+
+    // Start / end caps on the lane line
+    const capS = document.createElement('div');
+    capS.className = 'lane-cap-start';
+    capS.style.background = `#27ae6055`;
+    track.appendChild(capS);
+
+    const capE = document.createElement('div');
+    capE.className = 'lane-cap-end';
+    capE.style.background = `#ca6f1e55`;
+    track.appendChild(capE);
+
+    // Year vertical gridlines
+    for (let y = YR_START; y <= YR_END; y++) {
+      const vl = document.createElement('div');
+      vl.className = 'yr-vline';
+      vl.style.left = yearLeft[y] + 'px';
+      track.appendChild(vl);
+    }
+
+    // Group by year for collision offset
+    const byYear = {};
+    catEvs.forEach(ev => { (byYear[ev.year] = byYear[ev.year] || []).push(ev); });
+
+    // Thumbnails
+    catEvs.forEach(ev => {
+      const thumb = document.createElement('div');
+      thumb.className = 'ev-thumb';
+      thumb.dataset.id = ev.id;
+      const group = byYear[ev.year];
+      const gi = group.indexOf(ev);
+      const xOffset = group.length > 1 ? (gi - (group.length - 1) / 2) * (108 + 8) : 0;
+      thumb.style.left = (yearToX(ev.year) + xOffset) + 'px';
+      thumb.style.background = `linear-gradient(145deg, ${shade(cat.color)}, ${cat.color})`;
+
+      const yr = document.createElement('div');
+      yr.className = 'ev-thumb-yr';
+      yr.textContent = ev.year;
+
+      const title = document.createElement('div');
+      title.className = 'ev-thumb-title';
+      title.textContent = ev.title.replace(/^\[PLACEHOLDER\]\s*/, '');
+
+      thumb.appendChild(yr);
+      thumb.appendChild(title);
+
+      thumb.addEventListener('click', () => openModal(ev.sortIdx));
+      track.appendChild(thumb);
+    });
+
+    lane.appendChild(lbl);
+    lane.appendChild(track);
+    wrap.appendChild(lane);
+  });
+}
+
+// ── LANE HEIGHTS ─────────────────────────────────────────────────────────────
+function redistributeHeights() {
+  const totalH = window.innerHeight - HDR_H - YR_ROW_H;
+  const lanes = [...document.querySelectorAll('.lane')];
+  const laneH = lanes.length ? Math.floor(totalH / lanes.length) : 0;
+  const thumbH = Math.min(72, Math.max(38, laneH - 18));
+  document.documentElement.style.setProperty('--thumb-h', thumbH + 'px');
+  lanes.forEach(l => { l.style.height = laneH + 'px'; });
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+const overlay  = document.getElementById('modalOverlay');
+const modalEl  = document.getElementById('modal');
+
+function openModal(idx) {
+  currentIdx = idx;
+  modalOpen  = true;
+  updateModal();
+  overlay.classList.add('open');
+}
+
+function closeModal() {
+  modalOpen = false;
+  overlay.classList.remove('open');
+  document.querySelectorAll('.ev-thumb.active').forEach(t => t.classList.remove('active'));
+}
+
+function updateModal() {
+  const ev  = SORTED[currentIdx];
+  const cat = CATS[ev.category];
+
+  // Highlight thumbnail
+  document.querySelectorAll('.ev-thumb.active').forEach(t => t.classList.remove('active'));
+  const thumb = document.querySelector(`.ev-thumb[data-id="${ev.id}"]`);
+  if (thumb) thumb.classList.add('active');
+  scrollToThumb(thumb);
+
+  // Media
+  const media = document.getElementById('modalMedia');
+  if (ev.media.type === 'video') {
+    media.style.background = `linear-gradient(145deg, ${shade(cat.color, 0.65)}, ${cat.color})`;
+    media.innerHTML = `
+      <div class="modal-play">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+      </div>
+      <div class="modal-media-hint" style="color:rgba(255,255,255,.82)">📹 Add video<br><em>${ev.media.hint}</em></div>`;
+  } else {
+    media.style.background = `${cat.color}16`;
+    media.innerHTML = `
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="${cat.color}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21,15 16,10 5,21"/>
+      </svg>
+      <div class="modal-media-hint" style="color:${cat.color}">🖼️ Add image<br><em>${ev.media.hint}</em></div>`;
+  }
+
+  // Text
+  document.getElementById('modalMeta').innerHTML =
+    `<span class="modal-badge" style="background:${cat.color}">${cat.label}</span>
+     <span class="modal-year">${ev.year}</span>`;
+
+  document.getElementById('modalTitle').textContent  = ev.title;
+  document.getElementById('modalSub').textContent    = ev.subtitle;
+  document.getElementById('modalDetail').textContent = ev.detail;
+
+  const note = document.getElementById('modalNote');
+  note.textContent = '✏️ Placeholder — update this entry in the EVENTS array in the script.';
+  note.classList.toggle('show', !!ev.placeholder);
+
+  // Progress
+  document.getElementById('modalProgress').innerHTML =
+    `${currentIdx + 1} <span style="opacity:.5">/ ${SORTED.length}</span>
+     <small>${cat.label}</small>`;
+
+  // Global nav buttons
+  document.getElementById('modalPrev').disabled = currentIdx === 0;
+  document.getElementById('modalNext').disabled = currentIdx === SORTED.length - 1;
+
+  // Category nav buttons
+  const catEvs = SORTED.filter(e => e.category === ev.category);
+  const catPos  = catEvs.findIndex(e => e.id === ev.id);
+  const catPrevBtn = document.getElementById('modalCatPrev');
+  const catNextBtn = document.getElementById('modalCatNext');
+  catPrevBtn.style.background = cat.color;
+  catNextBtn.style.background = cat.color;
+  catPrevBtn.disabled = catPos === 0;
+  catNextBtn.disabled = catPos === catEvs.length - 1;
+  const catLabel = document.getElementById('modalCatLabel');
+  catLabel.textContent = `${catPos + 1} / ${catEvs.length} in ${cat.label}`;
+  catLabel.style.color = cat.color;
+}
+
+function scrollToThumb(thumb) {
+  if (!thumb) return;
+  const wrap = document.getElementById('tlWrap');
+  const wr = wrap.getBoundingClientRect();
+  const tr = thumb.getBoundingClientRect();
+  const target = wrap.scrollLeft + (tr.left - wr.left) - wrap.clientWidth / 2 + tr.width / 2;
+  wrap.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.getElementById('modalPrev').addEventListener('click', () => { if (currentIdx > 0) { currentIdx--; updateModal(); } });
+document.getElementById('modalNext').addEventListener('click', () => { if (currentIdx < SORTED.length - 1) { currentIdx++; updateModal(); } });
+
+document.getElementById('modalCatPrev').addEventListener('click', () => {
+  const ev = SORTED[currentIdx];
+  const catEvs = SORTED.filter(e => e.category === ev.category);
+  const catPos  = catEvs.findIndex(e => e.id === ev.id);
+  if (catPos > 0) { currentIdx = catEvs[catPos - 1].sortIdx; updateModal(); }
+});
+document.getElementById('modalCatNext').addEventListener('click', () => {
+  const ev = SORTED[currentIdx];
+  const catEvs = SORTED.filter(e => e.category === ev.category);
+  const catPos  = catEvs.findIndex(e => e.id === ev.id);
+  if (catPos < catEvs.length - 1) { currentIdx = catEvs[catPos + 1].sortIdx; updateModal(); }
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (!modalOpen) return;
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'ArrowLeft'  && currentIdx > 0)               { currentIdx--; updateModal(); }
+  if (e.key === 'ArrowRight' && currentIdx < SORTED.length-1) { currentIdx++; updateModal(); }
+});
+
+document.getElementById('startBtn').addEventListener('click', () => openModal(0));
+
+// ── INTRO ─────────────────────────────────────────────────────────────────────
+document.getElementById('introBtn').addEventListener('click', () => {
+  const intro = document.getElementById('introOverlay');
+  intro.classList.add('hiding');
+  setTimeout(() => intro.remove(), 580);
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+document.querySelector('.tl-inner').style.minWidth = (LBL_W + TOTAL_YR_W) + 'px';
+buildYearRuler();
+buildLanes();
+redistributeHeights();
+window.addEventListener('resize', redistributeHeights);
+</script>
+</body>
+</html>
